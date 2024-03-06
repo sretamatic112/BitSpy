@@ -1,0 +1,66 @@
+﻿@page "/metrics"
+@using BitSpy.Ui.Response
+@inject HttpClient client
+
+<PageTitle>Metrics</PageTitle>
+
+<h1>Metrics</h1>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Timestamp</th>
+                <th>Time in GC<br />Since Last GC (%)</th>
+                <th>Allocation<br />Rate Per Second</th>
+                <th>CPU Usage</th>
+                <th>Exception<br />Count</th>
+                <th>Gen0 Size</th>
+                <th>Gen1 Size</th>
+                <th>Gen2 Size</th>
+                <th>Gen0 Collection<br />Count</th>
+                <th>Gen1 Collection<br />Count</th>
+                <th>Gen2 Collection<br />Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var metric in metrics)
+            {
+                <tr>
+                    <td>@metric.Name</td>
+                    <td>@metric.Timestamp</td>
+                    <td>@metric.TimeInGCSinceLastGCPercentage</td>
+                    <td>@metric.AllocationRatePerSecond</td>
+                    <td>@metric.CPUUsage</td>
+                    <td>@metric.ExceptionCount</td>
+                    <td>@metric.Gen0Size</td>
+                    <td>@metric.Gen1Size</td>
+                    <td>@metric.Gen2Size</td>
+                    <td>@metric.Gen0CollectionCount</td>
+                    <td>@metric.Gen1CollectionCount</td>
+                    <td>@metric.Gen2CollectionCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<MetricResponse> metrics = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMetrics();
+    }
+
+    private async Task LoadMetrics()
+    {
+        var startingDate = DateTime.Now.AddYears(-1);
+        var endingDate = DateTime.Now.AddYears(1);
+        var response = await client.GetAsync($"{ApiConstants.ApiUrl}/metrics/all?startingTimeStamp={startingDate}&endingTimeStamp={endingDate}");
+        metrics = await response.Content.ReadFromJsonAsync<List<MetricResponse>>() ?? new List<MetricResponse>();
+    }
+}
+
+

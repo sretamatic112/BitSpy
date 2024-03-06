@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4F376EAE-501B-46A0-B405-8968121E7CBD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{CAC0656C-5B24-4237-A935-7C0D7F723A8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitSpy.Api", "src\BitSpy.Api\BitSpy.Api.csproj", "{12BA7D49-C883-498A-844A-A6D898E227A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitSpy.Ui", "src\BitSpy.Ui\BitSpy.Ui.csproj", "{D3996214-B31F-4366-9227-D82D7C054048}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitSpy.Api.Tests.Integration", "tests\BitSpy.Api.Tests.Integration\BitSpy.Api.Tests.Integration.csproj", "{873F159A-6FC6-4C4C-95EF-3C308880D759}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{12BA7D49-C883-498A-844A-A6D898E227A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12BA7D49-C883-498A-844A-A6D898E227A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12BA7D49-C883-498A-844A-A6D898E227A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12BA7D49-C883-498A-844A-A6D898E227A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3996214-B31F-4366-9227-D82D7C054048}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3996214-B31F-4366-9227-D82D7C054048}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3996214-B31F-4366-9227-D82D7C054048}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3996214-B31F-4366-9227-D82D7C054048}.Release|Any CPU.Build.0 = Release|Any CPU
+		{873F159A-6FC6-4C4C-95EF-3C308880D759}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{873F159A-6FC6-4C4C-95EF-3C308880D759}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{873F159A-6FC6-4C4C-95EF-3C308880D759}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{873F159A-6FC6-4C4C-95EF-3C308880D759}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{12BA7D49-C883-498A-844A-A6D898E227A1} = {4F376EAE-501B-46A0-B405-8968121E7CBD}
+		{D3996214-B31F-4366-9227-D82D7C054048} = {4F376EAE-501B-46A0-B405-8968121E7CBD}
+		{873F159A-6FC6-4C4C-95EF-3C308880D759} = {CAC0656C-5B24-4237-A935-7C0D7F723A8B}
+	EndGlobalSection
+EndGlobal

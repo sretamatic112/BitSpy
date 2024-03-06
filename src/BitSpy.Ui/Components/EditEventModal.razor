@@ -1,0 +1,76 @@
+﻿@using BitSpy.Ui.Response
+@using System.Net.Http.Headers
+@inject HttpClient HttpClient
+
+
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit event</h4>
+                <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" @bind="@_newName"/>
+            </div>
+            <div class="modal-footer">
+                @switch (DialogType)
+                {
+                    case ModalDialogType.Ok:
+                        <button type="button" class="btn btn-primary" @onclick=@(async () => await ModalOk())>OK</button>
+                        break;
+                    case ModalDialogType.Cancel:
+                        <button type="button" class="btn" @onclick="@(async () => await ModalCancel())">Cancel</button>
+                        break;
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public EventResponse Event { get; set; }
+    
+    [Parameter]
+    public ModalDialogType DialogType { get; set; }
+    
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+    
+    private string _newName = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _newName = Event.Name;
+        base.OnInitialized();
+    }
+
+    private async Task UpdateEvent()
+    {
+        if (_newName.Length > 0 && Event.Name != _newName)
+        {
+            string oldName = Event.Name;
+            Event.Name = _newName;
+            await HttpClient.PutAsJsonAsync($"{ApiConstants.ApiUrl}/events/{oldName}", Event);
+        }
+    }
+    
+    private Task ModalCancel()
+    {
+        return OnClose.InvokeAsync();
+    }
+
+    private async Task ModalOk()
+    {
+        await UpdateEvent();
+        await OnClose.InvokeAsync();
+    }
+
+    public enum ModalDialogType
+    {
+        Ok,
+        Cancel
+    }
+}

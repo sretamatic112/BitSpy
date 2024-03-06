@@ -1,0 +1,291 @@
+﻿@page "/traces"
+@using BitSpy.Ui.Response
+@using BitSpy.Ui.Components
+@using Syncfusion.Blazor.Charts
+@inject HttpClient Client
+
+<PageTitle>Traces</PageTitle>
+
+<h1>Traces</h1>
+
+<form @onsubmit="async () => await SearchTraces()">
+    <div class="mb-3">
+        <label for="traceDuration" class="form-label">Duration</label>
+        <input type="number" class="form-control" @bind="_traceDuration" placeholder="Search by trace duration..." />
+    </div>
+    <div class="mb-3">
+        <label for="traceCounter" class="form-label">Trace counter</label>
+        <input type="number" class="form-control" @bind="_traceCounter" placeholder="Search by trace counter..." />
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+@if (_traces.Count == 0)
+{
+    <p class="mt-3">
+        <em>There are no traces with these parameters.</em>
+    </p>
+}
+else
+{
+    <table class="table table-bordered table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Duration</th>
+                <th>Attributes</th>
+                <th>Events</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var trace in _traces)
+            {
+                <tr>
+                    <td>@trace.Name</td>
+                    <td>@trace.Duration.ToString()</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            @foreach (var a in trace.Attributes)
+                            {
+                                <li>@a.Name: @a.Value</li>
+                            }
+                        </ul>
+                    </td>
+                    <td>
+                        <ul class="list-unstyled">
+                            @foreach (var eventRelationship in trace.Events)
+                            {
+                                <li>@eventRelationship.Event.Name</li>
+                                <li>@eventRelationship.EventAvgDuration.ToString()</li>
+                            }
+                        </ul>
+                    </td>
+                    <td>
+                        <button @onclick="async () => await OpenTraceModal(trace)" class="btn btn-warning">Edit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (_showEventModal)
+{
+    Console.WriteLine("Rendering event modal");
+    <EditEventModal Event="@_selectedEvent" OnClose="async () => await OnEventModalClosed()" />
+}
+
+@if (_showTraceModal)
+{
+    <EditTraceModal Trace="@_selectedTrace" OnClose="async () => await OnTraceModalClosed()" />
+}
+
+<h1>Events</h1>
+
+<form @onsubmit="async () => await SearchEvents()">
+    <div class="mb-3">
+        <label for="eventDuration" class="form-label">Event duration</label>
+        <input type="number" class="form-control" @bind="_eventDuration" placeholder="Search by event duration..." />
+    </div>
+    <div class="mb-3">
+        <label for="traceName" class="form-label">Trace name</label>
+        <input type="text" class="form-control" @bind="_traceName" placeholder="Search by trace name..." />
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+@if (_events.Count == 0)
+{
+    <p class="mt-3">
+        <em>There are no events with these parameters.</em>
+    </p>
+}
+else
+{
+    <table class="table table-bordered table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Message</th>
+                <th>Duration(ms)</th>
+                <th>Attributes</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in _events)
+            {
+                <tr>
+                    <td>@e.Name</td>
+                    <td>@e.Message</td>
+                    <td>@e.Duration</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            @foreach (var a in e.Attributes)
+                            {
+                                <li>@a.Name: @a.Value</li>
+                            }
+                        </ul>
+                    </td>
+                    <td>
+                        <button @onclick="() => OpenEventModal(e)" class="btn btn-warning">Edit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@*
+<div class="control-section" align='center'>
+    <SfChart Title="Family Expenses for Year" Width="@Width">
+        <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
+        <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Interval="1" LabelIntersectAction="@Label" LabelRotation="@Rotation">
+            <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+            <ChartAxisMinorGridLines Width="0"></ChartAxisMinorGridLines>
+            <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+            <ChartAxisMinorTickLines Width="0"></ChartAxisMinorTickLines>
+            <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+        </ChartPrimaryXAxis>
+        <ChartPrimaryYAxis LabelFormat="${value}" Interval="100" Minimum="0" Maximum="400">
+            <ChartAxisMajorGridLines Width="1"></ChartAxisMajorGridLines>
+            <ChartAxisMinorGridLines Width="1"></ChartAxisMinorGridLines>
+            <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+            <ChartAxisMinorTickLines Width="0"></ChartAxisMinorTickLines>
+            <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+        </ChartPrimaryYAxis>
+        <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+        <ChartLegendSettings EnableHighlight="true"></ChartLegendSettings>
+        <ChartSeriesCollection>
+            <ChartSeries DataSource="@ChartTraceData" XName="Day" YName="Count" Width="2"
+                         Opacity="1" YName="JohnExpenses" Type="ChartSeriesType.StackingColumn">
+                <ChartMarker IsFilled="true" Visible="true" Height="7"  Width="7" Shape="ChartShape.Circle">
+                </ChartMarker>
+            </ChartSeries>
+        </ChartSeriesCollection>
+    </SfChart>
+</div>
+*@
+
+
+<div  class="control-section" align="center">
+        <div class="control-section">
+            <SfAccumulationChart EnableBorderOnMouseMove="false" Title="Event duration in ms" EnableAnimation="true">
+                <AccumulationChartTooltipSettings Header="" Format="<b>${point.x}</b><br>Browser Share: <b>${point.y}%</b>" Enable="true"></AccumulationChartTooltipSettings>
+                <AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
+                <AccumulationChartSeriesCollection>
+                    <AccumulationChartSeries DataSource="@_events" XName="Name" YName="Duration" Radius="@_eventPieRadius" Name="Name" StartAngle="@StartAngle"
+                                             InnerRadius="0%" ExplodeIndex="0" Explode="true" ExplodeOffset="@_explodeRadius">
+                        <AccumulationDataLabelSettings Visible="true" Name="Label" Position="AccumulationLabelPosition.Outside">
+                            <AccumulationChartDataLabelFont Size=@Size FontWeight="600"></AccumulationChartDataLabelFont>
+                            <AccumulationChartConnector Length=@_eventPieConnectorLength Type="ConnectorType.Curve"></AccumulationChartConnector>
+                        </AccumulationDataLabelSettings>
+                    </AccumulationChartSeries>
+                </AccumulationChartSeriesCollection>
+            </SfAccumulationChart>
+        </div>
+    </div>
+
+
+
+@code {
+    private List<TraceResponse> _traces = new();
+    private long _traceDuration = 0;
+    private long _traceCounter = 0;
+    private bool _showTraceModal = false;
+
+    private List<EventResponse> _events = new();
+    private long _eventDuration = 0;
+    private string _traceName = string.Empty;
+    private bool _showEventModal = false;
+
+    private TraceResponse _selectedTrace = default!;
+    private EventResponse _selectedEvent = default!;
+    
+    
+    //chart data
+    
+    private string Width { get; set; } = "60%";
+    private double Rotation { get; set; } = 0;
+    private LabelIntersectAction Label { get; set; } = LabelIntersectAction.Trim;
+    private List<TraceChartData> ChartTraceData { get; set; } = new();
+    private List<TraceChartData> DummyChartData => new List<TraceChartData>
+    {
+        new TraceChartData { Day = "2022-01-01", Count = 10 },
+        new TraceChartData { Day = "2022-01-02", Count = 20 },
+        // Add more dummy data as needed
+    };
+    
+    
+    //event data:
+    private readonly string _explodeRadius = "20%";
+    private readonly string _eventPieRadius = "80%";
+    private readonly string _eventPieConnectorLength = "10px";
+    private const int StartAngle = 30;
+    private string Size { get; set; } = "15px";
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTraces();
+        await LoadEvents();
+    }
+
+    private async Task SearchTraces()
+    {
+        await LoadTraces();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LoadTraces()
+    {
+        var response = await Client.GetAsync($"{ApiConstants.ApiUrl}/bottleneck/traces?duration={_traceDuration}&traceCounter={_traceCounter}");
+        _traces = await response.Content.ReadFromJsonAsync<List<TraceResponse>>() ?? new();
+    }
+
+    private async Task LoadEvents()
+    {
+        var response = await Client.GetAsync($"{ApiConstants.ApiUrl}/bottleneck/events?duration={_eventDuration}&traceName={_traceName}");
+        _events = await response.Content.ReadFromJsonAsync<List<EventResponse>>() ?? new();
+    }
+
+    private async Task SearchEvents()
+    {
+        await LoadEvents();
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task OpenTraceModal(TraceResponse trace)
+    {
+        _selectedTrace = trace;
+        _showTraceModal = true;
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task OpenEventModal(EventResponse @event)
+    {
+        _selectedEvent = @event;
+        _showEventModal = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    private async Task OnEventModalClosed()
+    {
+        _showEventModal = false;
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task OnTraceModalClosed()
+    {
+        _showTraceModal = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public class TraceChartData
+    {
+        public string Day { get; set; }
+        public int Count { get; set; }
+    }
+
+}

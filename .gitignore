@@ -1,0 +1,7 @@
+﻿.idea
+src/BitSpy.Api/bin
+src/BitSpy.Api/obj
+src/BitSpy.Ui/bin
+src/BitSpy.Ui/obj
+tests/BitSpy.Api.Tests.Integration/bin
+tests/BitSpy.Api.Tests.Integration/obj

@@ -1,0 +1,39 @@
+﻿version: '3.8'
+services:
+  cassandra:
+    image: cassandra:latest
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+
+  neo4j:
+    image: neo4j:latest
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+
+  bitspy_api:
+    build:
+      context: ./src/BitSpy.Api
+      dockerfile: Dockerfile
+    ports:
+      - "7185:7185"
+    depends_on:
+      - cassandra
+      - neo4j
+
+  bitspy_ui:
+    build:
+      context: ./src/BitSpy.Ui
+      dockerfile: Dockerfile
+    ports:
+      - "7186:7186"
+    depends_on:
+      - bitspy_api
+
+volumes:
+  cassandra_data:
+  neo4j_data:
